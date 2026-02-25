@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EPANET Network Map</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <aside class="panel">
+        <p class="hint">
+          Sube un archivo de red EPANET (<code>.net</code> o <code>.inp</code>) para dibujar tuberías y nodos.
+        </p>
+
+        <form id="networkForm" class="form">
+          <label for="fileInput">Archivo de red</label>
+          <div class="file-picker">
+            <input id="fileInput" class="file-input-native" name="file" type="file" accept=".net,.inp,.txt" required />
+            <label for="fileInput" class="file-picker-btn">Seleccionar archivo</label>
+            <span id="fileInputName" class="file-picker-name">Sin archivo seleccionado</span>
+          </div>
+
+          <label for="coordinateMode">Modo de coordenadas</label>
+          <select id="coordinateMode" name="coordinate_mode">
+            <option value="utm" selected>UTM (Easting/Northing)</option>
+            <option value="local">Local</option>
+          </select>
+          <p class="field-help">
+            Usa Local para XY arbitrario o UTM para coordenadas proyectadas.
+          </p>
+
+          <div id="localSettings">
+            <div class="grid">
+              <div>
+                <label for="centerLat">Latitud base</label>
+                <input id="centerLat" name="center_lat" type="number" step="any" value="0" />
+              </div>
+              <div>
+                <label for="centerLon">Longitud base</label>
+                <input id="centerLon" name="center_lon" type="number" step="any" value="0" />
+              </div>
+            </div>
+
+            <label for="metersPerUnit">Metros por unidad del modelo</label>
+            <input id="metersPerUnit" name="meters_per_unit" type="number" step="any" value="1" min="0.000001" />
+          </div>
+
+          <div id="utmSettings" class="hidden">
+            <label for="utmZone">Zona UTM</label>
+            <input id="utmZone" name="utm_zone" type="text" placeholder="14Q" />
+            <p class="field-help">
+              Formato: Número de zona (1-60) + letra de banda (C-X). Zonas típicas: CDMX 14Q, Guanajuato 14Q, Aguascalientes 13Q, Madrid 30T, Barcelona 31T.
+            </p>
+          </div>
+
+          <div class="row">
+            <button type="button" id="locateBtn">Usar mi ubicación</button>
+            <button type="submit" id="drawBtn">Dibujar red</button>
+          </div>
+          <p class="field-help">
+            Haz clic en una tubería, nodo o tanque/reservorio del mapa para ver su información.
+          </p>
+
+          <h2 class="section-title">Capas y colores</h2>
+
+          <div class="grid">
+            <label class="checkbox">
+              <input type="checkbox" id="showNodes" checked />
+              Nodos
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="showStorage" checked />
+              Tanques/Reservorios
+            </label>
+          </div>
+
+          <div class="color-grid">
+            <div class="style-item">
+              <label for="pipeColor">Tuberías</label>
+              <div class="style-controls">
+                <div>
+                  <span class="control-label">Color</span>
+                  <input id="pipeColor" type="color" value="#00ffff" />
+                </div>
+                <div>
+                  <span class="control-label">Grosor (px)</span>
+                  <input id="pipeWidth" type="number" min="1" max="20" step="0.5" value="3" />
+                </div>
+              </div>
+            </div>
+            <div class="style-item">
+              <label for="nodeColor">Nodos</label>
+              <div class="style-controls">
+                <div>
+                  <span class="control-label">Color</span>
+                  <input id="nodeColor" type="color" value="#ff00ff" />
+                </div>
+                <div>
+                  <span class="control-label">Radio (px)</span>
+                  <input id="nodeRadius" type="number" min="1" max="20" step="0.5" value="4" />
+                </div>
+              </div>
+            </div>
+            <div class="style-item">
+              <label for="storageColor">Tanques/Reservorios</label>
+              <div class="style-controls">
+                <div>
+                  <span class="control-label">Color</span>
+                  <input id="storageColor" type="color" value="#00ff00" />
+                </div>
+                <div>
+                  <span class="control-label">Tamaño (px)</span>
+                  <input id="reservoirSize" type="number" min="4" max="40" step="1" value="12" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+
+        <section id="status" class="status">Esperando archivo...</section>
+        <section id="summary" class="summary"></section>
+      </aside>
+
+      <section id="map"></section>
+    </main>
+    <footer class="page-copyright">(c) 2026, Ildeberto de los Santos Ruiz</footer>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      crossorigin=""
+    ></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
