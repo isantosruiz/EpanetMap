@@ -9,6 +9,12 @@
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       crossorigin=""
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
+    />
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
@@ -34,6 +40,12 @@
           <p class="field-help">
             Usa Local para XY arbitrario o UTM para coordenadas proyectadas.
           </p>
+
+          <label for="basemapStyle">Mapa base</label>
+          <select id="basemapStyle" name="basemap_style">
+            <option value="satellite" selected>Satellite map</option>
+            <option value="streets">Street map</option>
+          </select>
 
           <div id="localSettings">
             <div class="grid">
@@ -64,7 +76,7 @@
             <button type="submit" id="drawBtn">Dibujar red</button>
           </div>
           <p class="field-help">
-            Haz clic en una tubería, nodo o tanque/reservorio del mapa para ver su información.
+            Haz clic en una tubería, nodo o almacenamiento del mapa para ver su información.
           </p>
 
           <h2 class="section-title">Capas y colores</h2>
@@ -76,56 +88,62 @@
             </label>
             <label class="checkbox">
               <input type="checkbox" id="showStorage" checked />
-              Tanques/Reservorios
+              Almacenamiento
             </label>
           </div>
 
-          <div class="color-grid">
-            <div class="style-item">
-              <label for="pipeColor">Tuberías</label>
-              <div class="style-controls">
-                <div>
-                  <span class="control-label">Color</span>
-                  <input id="pipeColor" type="color" value="#00ffff" />
+          <details class="advanced-style">
+            <summary>Personalizar colores y tamaños</summary>
+            <div class="color-grid">
+              <div class="style-item">
+                <label for="pipeColor">Tuberías</label>
+                <div class="style-controls">
+                  <div>
+                    <span class="control-label">Color</span>
+                    <input id="pipeColor" type="color" value="#00ffff" />
+                  </div>
+                  <div>
+                    <span class="control-label">Grosor (px)</span>
+                    <input id="pipeWidth" type="number" min="1" max="20" step="0.5" value="3" />
+                  </div>
                 </div>
-                <div>
-                  <span class="control-label">Grosor (px)</span>
-                  <input id="pipeWidth" type="number" min="1" max="20" step="0.5" value="3" />
+              </div>
+              <div class="style-item">
+                <label for="nodeColor">Nodos</label>
+                <div class="style-controls">
+                  <div>
+                    <span class="control-label">Color</span>
+                    <input id="nodeColor" type="color" value="#ff00ff" />
+                  </div>
+                  <div>
+                    <span class="control-label">Radio (px)</span>
+                    <input id="nodeRadius" type="number" min="1" max="20" step="0.5" value="4" />
+                  </div>
+                </div>
+              </div>
+              <div class="style-item">
+                <label for="storageColor">Almacenamiento</label>
+                <div class="style-controls">
+                  <div>
+                    <span class="control-label">Color</span>
+                    <input id="storageColor" type="color" value="#00ff00" />
+                  </div>
+                  <div>
+                    <span class="control-label">Tamaño (px)</span>
+                    <input id="reservoirSize" type="number" min="4" max="40" step="1" value="12" />
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="style-item">
-              <label for="nodeColor">Nodos</label>
-              <div class="style-controls">
-                <div>
-                  <span class="control-label">Color</span>
-                  <input id="nodeColor" type="color" value="#ff00ff" />
-                </div>
-                <div>
-                  <span class="control-label">Radio (px)</span>
-                  <input id="nodeRadius" type="number" min="1" max="20" step="0.5" value="4" />
-                </div>
-              </div>
-            </div>
-            <div class="style-item">
-              <label for="storageColor">Tanques/Reservorios</label>
-              <div class="style-controls">
-                <div>
-                  <span class="control-label">Color</span>
-                  <input id="storageColor" type="color" value="#00ff00" />
-                </div>
-                <div>
-                  <span class="control-label">Tamaño (px)</span>
-                  <input id="reservoirSize" type="number" min="4" max="40" step="1" value="12" />
-                </div>
-              </div>
-            </div>
-          </div>
+          </details>
 
         </form>
 
         <section id="status" class="status">Esperando archivo...</section>
-        <section id="summary" class="summary"></section>
+        <section id="summary" class="summary">
+          <p class="summary-title">Información de la red</p>
+          <div id="summaryContent" class="summary-content"></div>
+        </section>
       </aside>
 
       <section id="map"></section>

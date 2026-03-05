@@ -1,14 +1,38 @@
 const map = L.map("map", { zoomControl: true }).setView([20, 0], 2);
 
-L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  {
-    maxZoom: 19,
-    crossOrigin: "anonymous",
-    attribution:
-      "Tiles &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+const basemapLayers = {
+  satellite: L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom: 19,
+      crossOrigin: "anonymous",
+      attribution:
+        "Tiles &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+    }
+  ),
+  streets: L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom: 19,
+      crossOrigin: "anonymous",
+      attribution:
+        "Tiles &copy; Esri, HERE, Garmin, USGS, Intermap, INCREMENT P, NGA, USGS",
+    }
+  ),
+};
+
+let activeBasemapLayer = null;
+
+function setBasemap(style) {
+  const selectedStyle = basemapLayers[style] ? style : "satellite";
+  const nextLayer = basemapLayers[selectedStyle];
+  if (activeBasemapLayer === nextLayer) return;
+  if (activeBasemapLayer) {
+    map.removeLayer(activeBasemapLayer);
   }
-).addTo(map);
+  activeBasemapLayer = nextLayer;
+  activeBasemapLayer.addTo(map);
+}
 
 const pipesLayer = L.layerGroup().addTo(map);
 const nodesLayer = L.layerGroup().addTo(map);
@@ -20,6 +44,7 @@ const centerLatInput = document.getElementById("centerLat");
 const centerLonInput = document.getElementById("centerLon");
 const metersPerUnitInput = document.getElementById("metersPerUnit");
 const coordinateModeInput = document.getElementById("coordinateMode");
+const basemapStyleInput = document.getElementById("basemapStyle");
 const localSettings = document.getElementById("localSettings");
 const utmSettings = document.getElementById("utmSettings");
 const utmZoneInput = document.getElementById("utmZone");
@@ -33,9 +58,10 @@ const storageColorInput = document.getElementById("storageColor");
 const reservoirSizeInput = document.getElementById("reservoirSize");
 const locateBtn = document.getElementById("locateBtn");
 const statusBox = document.getElementById("status");
-const summaryBox = document.getElementById("summary");
+const summaryContentBox = document.getElementById("summaryContent");
 
 let latestPayload = null;
+setBasemap((basemapStyleInput && basemapStyleInput.value) || "satellite");
 
 function updateFileNameLabel() {
   const selected = fileInput.files && fileInput.files.length > 0 ? fileInput.files[0].name : "";
@@ -169,9 +195,9 @@ function setSummary(payload) {
   const nodeCount = payload.nodes.filter((node) => !isStorageNode(node.type)).length;
   const storageCount = payload.nodes.filter((node) => isStorageNode(node.type)).length;
 
-  summaryBox.innerHTML = `
+  summaryContentBox.innerHTML = `
     <p><strong>Nodos:</strong> ${nodeCount}</p>
-    <p><strong>Tanques/Reservorios:</strong> ${storageCount}</p>
+    <p><strong>Almacenamiento:</strong> ${storageCount}</p>
     <p><strong>Tuberías:</strong> ${payload.meta.pipe_count}</p>
     <p>${modeText}</p>
   `;
@@ -205,6 +231,10 @@ locateBtn.addEventListener("click", () => {
 
 coordinateModeInput.addEventListener("change", () => {
   updateModeUI();
+});
+
+basemapStyleInput.addEventListener("change", () => {
+  setBasemap(basemapStyleInput.value);
 });
 
 utmZoneInput.addEventListener("input", () => {
@@ -269,7 +299,7 @@ form.addEventListener("submit", async (event) => {
   } catch (error) {
     latestPayload = null;
     clearLayers();
-    summaryBox.innerHTML = "";
+    summaryContentBox.innerHTML = "";
     setStatus(error.message, true);
   }
 });
