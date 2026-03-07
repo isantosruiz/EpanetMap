@@ -1,4 +1,4 @@
-# EPANET Map Viewer (Python + Vercel)
+# EPANET Map Viewer
 
 Aplicacion web en Python para cargar un archivo EPANET (`.net` o `.inp`) desde el equipo del usuario y dibujar la red de tuberias sobre un mapa satelital real.
 
